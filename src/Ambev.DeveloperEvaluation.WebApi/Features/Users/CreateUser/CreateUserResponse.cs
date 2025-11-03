@@ -1,4 +1,5 @@
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users.CreateUser;
 
@@ -10,30 +11,34 @@ public class CreateUserResponse
     /// <summary>
     /// The unique identifier of the created user
     /// </summary>
-    public Guid Id { get; set; }
-
-    /// <summary>
-    /// The user's full name
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public Guid Id { get; init; }
 
     /// <summary>
     /// The user's email address
     /// </summary>
-    public string Email { get; set; } = string.Empty;
+    public string Email { get; init; } = string.Empty;
+
+    /// <summary>
+    /// The user's full name
+    /// </summary>
+    public string UserName { get; init; } = string.Empty;
+
+    public required FullName Name { get; init; }
+    
+    public required Address Address { get; init; }
 
     /// <summary>
     /// The user's phone number
     /// </summary>
-    public string Phone { get; set; } = string.Empty;
+    public string Phone { get; init; } = string.Empty;
 
     /// <summary>
     /// The user's role in the system
     /// </summary>
-    public UserRole Role { get; set; }
+    public UserRole Role { get; init; }
 
     /// <summary>
     /// The current status of the user
     /// </summary>
-    public UserStatus Status { get; set; }
+    public UserStatus Status { get; init; }
 }

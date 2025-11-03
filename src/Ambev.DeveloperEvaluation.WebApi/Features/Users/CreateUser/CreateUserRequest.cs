@@ -1,22 +1,21 @@
-﻿using Ambev.DeveloperEvaluation.Domain.Enums;
+﻿using System.Text.Json.Serialization;
+using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users.CreateUser;
 
 /// <summary>
 /// Represents a request to create a new user in the system.
 /// </summary>
-public class CreateUserRequest
+public sealed class CreateUserRequest
 {
-    /// <summary>
-    /// Gets or sets the username. Must be unique and contain only valid characters.
-    /// </summary>
-    public string Username { get; set; } = string.Empty;
-
+    public FullName? Name { get; set; }
     /// <summary>
     /// Gets or sets the password. Must meet security requirements.
     /// </summary>
     public string Password { get; set; } = string.Empty;
-
+    
+    public Address? Address { get; set; }
     /// <summary>
     /// Gets or sets the phone number in format (XX) XXXXX-XXXX.
     /// </summary>

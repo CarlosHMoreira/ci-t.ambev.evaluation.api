@@ -3,6 +3,7 @@ using System;
 using Ambev.DeveloperEvaluation.ORM;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Ambev.DeveloperEvaluation.ORM.Migrations
 {
     [DbContext(typeof(DefaultContext))]
-    partial class DefaultContextModelSnapshot : ModelSnapshot
+    [Migration("20251103014602_UpdateUserAddingFullName")]
+    partial class UpdateUserAddingFullName
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,63 +73,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
 
             modelBuilder.Entity("Ambev.DeveloperEvaluation.Domain.Entities.User", b =>
                 {
-                    b.OwnsOne("Ambev.DeveloperEvaluation.Domain.ValueObjects.Address", "Address", b1 =>
-                        {
-                            b1.Property<Guid>("UserId")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("City")
-                                .IsRequired()
-                                .HasMaxLength(120)
-                                .HasColumnType("character varying(120)");
-
-                            b1.Property<int>("Number")
-                                .HasMaxLength(20)
-                                .HasColumnType("integer");
-
-                            b1.Property<string>("Street")
-                                .IsRequired()
-                                .HasMaxLength(120)
-                                .HasColumnType("character varying(120)");
-
-                            b1.Property<string>("ZipCode")
-                                .IsRequired()
-                                .HasMaxLength(8)
-                                .HasColumnType("character varying(8)");
-
-                            b1.HasKey("UserId");
-
-                            b1.ToTable("UserAddresses", (string)null);
-
-                            b1.WithOwner()
-                                .HasForeignKey("UserId");
-
-                            b1.OwnsOne("Ambev.DeveloperEvaluation.Domain.ValueObjects.Geolocation", "Geolocation", b2 =>
-                                {
-                                    b2.Property<Guid>("AddressUserId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<decimal>("Latitude")
-                                        .HasColumnType("numeric")
-                                        .HasColumnName("lat");
-
-                                    b2.Property<decimal>("Longitude")
-                                        .HasColumnType("numeric")
-                                        .HasColumnName("long");
-
-                                    b2.HasKey("AddressUserId");
-
-                                    b2.ToTable("UserAddresses");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("AddressUserId");
-                                });
-
-                            b1.Navigation("Geolocation")
-                                .IsRequired();
-                        });
-
                     b.OwnsOne("Ambev.DeveloperEvaluation.Domain.ValueObjects.FullName", "Name", b1 =>
                         {
                             b1.Property<Guid>("UserId")
@@ -152,9 +98,6 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("UserId");
                         });
-
-                    b.Navigation("Address")
-                        .IsRequired();
 
                     b.Navigation("Name")
                         .IsRequired();

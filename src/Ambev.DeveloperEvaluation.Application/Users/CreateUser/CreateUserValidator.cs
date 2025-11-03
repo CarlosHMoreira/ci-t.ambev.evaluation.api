@@ -24,10 +24,11 @@ public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     public CreateUserCommandValidator()
     {
         RuleFor(user => user.Email).SetValidator(new EmailValidator());
-        RuleFor(user => user.Username).NotEmpty().Length(3, 50);
+        RuleFor(user => user.Name).SetValidator(new FullNameValidator());
         RuleFor(user => user.Password).SetValidator(new PasswordValidator());
+        RuleFor(user => user.Address).SetValidator(new AddressValidator());
         RuleFor(user => user.Phone).Matches(@"^\+?[1-9]\d{1,14}$");
-        RuleFor(user => user.Status).NotEqual(UserStatus.Unknown);
-        RuleFor(user => user.Role).NotEqual(UserRole.None);
+        RuleFor(user => user.Status).IsInEnum().NotEqual(UserStatus.Unknown);
+        RuleFor(user => user.Role).IsInEnum().NotEqual(UserRole.None);
     }
 }

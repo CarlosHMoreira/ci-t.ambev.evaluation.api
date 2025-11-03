@@ -1,7 +1,7 @@
 ﻿using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System.Text.RegularExpressions;
 
 namespace Ambev.DeveloperEvaluation.ORM.Mapping;
 
@@ -13,10 +13,12 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
 
         builder.HasKey(u => u.Id);
         builder.Property(u => u.Id).HasColumnType("uuid").HasDefaultValueSql("gen_random_uuid()");
+        
+        builder.Ignore(u => u.Username);
 
-        builder.Property(u => u.Username).IsRequired().HasMaxLength(50);
         builder.Property(u => u.Password).IsRequired().HasMaxLength(100);
         builder.Property(u => u.Email).IsRequired().HasMaxLength(100);
+        builder.HasIndex(u => u.Email).IsUnique();
         builder.Property(u => u.Phone).HasMaxLength(20);
 
         builder.Property(u => u.Status)
@@ -26,12 +28,48 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Role)
             .HasConversion<string>()
             .HasMaxLength(20);
-
+        
         builder.Property(u => u.CreatedAt)
             .HasColumnType("timestamp with time zone")
             .IsRequired();
 
-        builder.Property(u => u.CreatedAt)
+        builder.Property(u => u.UpdatedAt)
             .HasColumnType("timestamp with time zone");
+        
+        builder.OwnsOne<FullName>(u => u.Name, owned =>
+        {
+            owned.Property(p => p.FirstName)
+                .HasColumnName("FirstName")
+                .IsRequired()
+                .HasMaxLength(50);
+
+            owned.Property(p => p.LastName)
+                .HasColumnName("LastName")
+                .IsRequired()
+                .HasMaxLength(50);
+            owned.WithOwner();
+        });
+        
+        builder.OwnsOne<Address>(u => u.Address, owned =>
+        {
+            owned.ToTable("UserAddresses");
+            owned.Property(p => p.City).HasMaxLength(120).IsRequired();
+            owned.Property(p => p.Street).HasMaxLength(120).IsRequired();
+            owned.Property(p => p.Number).HasMaxLength(20).IsRequired();
+            owned.Property(p => p.ZipCode).HasMaxLength(8).IsRequired();
+            
+            owned.OwnsOne<Geolocation>(address => address.Geolocation, geolocationBuilder =>
+            {
+                geolocationBuilder
+                    .Property(geolocation => geolocation.Latitude)
+                    .HasColumnName("lat");
+                geolocationBuilder
+                    .Property(geolocation => geolocation.Longitude)
+                    .HasColumnName("long");
+            });
+            
+            owned.WithOwner().HasForeignKey("UserId");
+            owned.HasKey("UserId");
+        });
     }
 }
