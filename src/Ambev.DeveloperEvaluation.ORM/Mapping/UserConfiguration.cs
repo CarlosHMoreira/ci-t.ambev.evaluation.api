@@ -27,5 +27,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        builder.Property(u => u.CreatedAt)
+            .HasColumnType("timestamp with time zone")
+            .IsRequired();
+
+        builder.Property(u => u.CreatedAt)
+            .HasColumnType("timestamp with time zone");
     }
 }
