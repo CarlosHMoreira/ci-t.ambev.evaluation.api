@@ -19,17 +19,18 @@ services:
     volumes:
       - ${HOME}/.microsoft/usersecrets:/home/app/.microsoft/usersecrets
       - ${HOME}/.aspnet/https:/home/app/.aspnet/https
+    depends_on:
+      - ambev.developerevaluation.database
 
   ambev.developerevaluation.database:
     container_name: ambev_developer_evaluation_database
     image: postgres:13
-
     environment:
       POSTGRES_DB: developer_evaluation
       POSTGRES_USER: developer
       POSTGRES_PASSWORD: ev@luAt10n
     ports:
-      - "5432"
+      - "54322:5432"
     restart: unless-stopped
 
   ambev.developerevaluation.nosql:
@@ -39,14 +40,12 @@ services:
         MONGO_INITDB_ROOT_USERNAME: developer
         MONGO_INITDB_ROOT_PASSWORD: ev@luAt10n
     ports:
-      - "27017"
+      - "27018:27017"
 
   ambev.developerevaluation.cache:
     container_name: ambev_developer_evaluation_cache 
     image: redis:7.4.1-alpine     
     command: redis-server --requirepass ev@luAt10n
     environment:
-       MONGO_INITDB_ROOT_USERNAME: developer
-       MONGO_INITDB_ROOT_PASSWORD: ev@luAt10n
     ports:
-       - "6379"
+      - "6379:6379"
