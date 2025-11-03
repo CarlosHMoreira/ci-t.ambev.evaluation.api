@@ -46,6 +46,5 @@ services:
     container_name: ambev_developer_evaluation_cache 
     image: redis:7.4.1-alpine     
     command: redis-server --requirepass ev@luAt10n
-    environment:
     ports:
       - "6379:6379"
