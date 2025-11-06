@@ -1,4 +1,5 @@
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 
 namespace Ambev.DeveloperEvaluation.Application.Users.GetUser;
 
@@ -7,33 +8,12 @@ namespace Ambev.DeveloperEvaluation.Application.Users.GetUser;
 /// </summary>
 public class GetUserResult
 {
-    /// <summary>
-    /// The unique identifier of the user
-    /// </summary>
     public Guid Id { get; set; }
-
-    /// <summary>
-    /// The user's full name
-    /// </summary>
-    public string Name { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The user's email address
-    /// </summary>
     public string Email { get; set; } = string.Empty;
-
-    /// <summary>
-    /// The user's phone number
-    /// </summary>
-    public string Phone { get; set; } = string.Empty;   
-
-    /// <summary>
-    /// The user's role in the system
-    /// </summary>
+    public string UserName { get; set; } = string.Empty;
+    public required FullName Name { get; set; }
+    public required Address Address { get; set; }
+    public string Phone { get; set; } = string.Empty;
     public UserRole Role { get; set; }
-
-    /// <summary>
-    /// The current status of the user
-    /// </summary>
     public UserStatus Status { get; set; }
 }
