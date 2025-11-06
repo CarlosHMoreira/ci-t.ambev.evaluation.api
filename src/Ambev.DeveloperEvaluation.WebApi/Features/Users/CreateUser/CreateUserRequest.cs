@@ -29,10 +29,12 @@ public sealed class CreateUserRequest
     /// <summary>
     /// Gets or sets the initial status of the user account.
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserStatus Status { get; set; }
 
     /// <summary>
     /// Gets or sets the role assigned to the user.
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserRole Role { get; set; }
 }

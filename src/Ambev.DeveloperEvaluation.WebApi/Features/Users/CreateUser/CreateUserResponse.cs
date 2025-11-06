@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 
@@ -35,10 +36,12 @@ public class CreateUserResponse
     /// <summary>
     /// The user's role in the system
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserRole Role { get; init; }
 
     /// <summary>
     /// The current status of the user
     /// </summary>
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public UserStatus Status { get; init; }
 }
