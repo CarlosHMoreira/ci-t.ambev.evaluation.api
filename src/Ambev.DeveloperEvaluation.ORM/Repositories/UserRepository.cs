@@ -79,4 +79,51 @@ public class UserRepository : IUserRepository
         await _context.SaveChangesAsync(cancellationToken);
         return user;
     }
+
+    public async Task<(IEnumerable<User> Users, int TotalCount)> ListAsync(int page, int size, string? order, CancellationToken cancellationToken = default)
+    {
+        page = page < 1 ? 1 : page;
+        size = size < 100 ? 100 : size;
+        
+        var query = _context.Users.AsQueryable();
+        
+        query = OrderBy(order, query);
+        
+        var total = await query.CountAsync(cancellationToken);
+        var users = await query.Skip((page - 1) * size).Take(size).ToListAsync(cancellationToken);
+        return (users, total);
+    }
+
+    private static IQueryable<User> OrderBy(string? order, IQueryable<User> query)
+    {
+        if (string.IsNullOrWhiteSpace(order))
+        {
+            return query;
+        }
+        
+        foreach (var part in order.Split(','))
+        {
+            var trimmed = part.Trim();
+            if (string.IsNullOrEmpty(trimmed))
+            {
+                continue;
+            }
+                
+            var segments = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var field = segments[0].ToLowerInvariant();
+            var direction = segments.Length > 1 ? segments[1].ToLowerInvariant() : "asc";
+            query = ApplyOrdering(query, field, direction == "desc");
+        }
+
+        return query;
+    }
+
+    private static IQueryable<User> ApplyOrdering(IQueryable<User> source, string field, bool desc) =>
+        field switch
+        {
+            "email" => desc ? source.OrderByDescending(u => u.Email) : source.OrderBy(u => u.Email),
+            "username" => desc ? source.OrderByDescending(u => u.Name.FirstName) : source.OrderBy(u => u.Name.FirstName),
+            "createdat" => desc ? source.OrderByDescending(u => u.CreatedAt) : source.OrderBy(u => u.CreatedAt),
+            _ => source,
+        };
 }

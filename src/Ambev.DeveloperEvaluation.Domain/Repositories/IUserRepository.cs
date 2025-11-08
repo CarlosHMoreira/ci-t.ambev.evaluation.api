@@ -46,4 +46,14 @@ public interface IUserRepository
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The updated user</returns>
     Task<object> UpdateAsync(User user, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Lists users with pagination and optional ordering.
+    /// </summary>
+    /// <param name="page">Page number (1-based)</param>
+    /// <param name="size">Page size</param>
+    /// <param name="order">Ordering string e.g. "username asc, email desc"</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Tuple with users and total count</returns>
+    Task<(IEnumerable<User> Users, int TotalCount)> ListAsync(int page, int size, string? order, CancellationToken cancellationToken = default);
 }

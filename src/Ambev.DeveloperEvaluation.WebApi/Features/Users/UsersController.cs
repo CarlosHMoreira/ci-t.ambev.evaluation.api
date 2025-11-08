@@ -10,6 +10,8 @@ using Ambev.DeveloperEvaluation.Application.Users.GetUser;
 using Ambev.DeveloperEvaluation.Application.Users.DeleteUser;
 using Ambev.DeveloperEvaluation.Application.Users.UpdateUser;
 using Ambev.DeveloperEvaluation.WebApi.Features.Users.UpdateUser;
+using Ambev.DeveloperEvaluation.Application.Users.ListUsers;
+using Ambev.DeveloperEvaluation.WebApi.Features.Users.ListUsers;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users;
 
@@ -117,6 +119,13 @@ public class UsersController : BaseController
         return NoContent();
     }
     
+    /// <summary>
+    /// Updates an existing user
+    /// </summary>
+    /// <param name="id">The unique identifier of the user to update</param>
+    /// <param name="request">The user update request</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>The updated user details</returns>
     [HttpPut("{id}")]
     [ProducesResponseType(typeof(ApiResponseWithData<UpdateUserResponse>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -145,5 +154,28 @@ public class UsersController : BaseController
             Message = "User created successfully",
             Data = _mapper.Map<UpdateUserResponse>(result)
         });
+    }
+
+    /// <summary>
+    /// Retrieves a paginated list of users
+    /// </summary>
+    /// <param name="request">The user listing request with pagination</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>A paginated list of users</returns>
+    [HttpGet]
+    [ProducesResponseType(typeof(PaginatedResponse<ListUsersItem>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> ListUsers([FromQuery] ListUsersRequest request, CancellationToken cancellationToken)
+    {
+        var validator = new ListUsersRequestValidator();
+        var validationResult = await validator.ValidateAsync(request, cancellationToken);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(validationResult.Errors);
+        }
+
+        var command = _mapper.Map<ListUsersCommand>(request);
+        var result = await _mediator.Send(command, cancellationToken);
+        var response = _mapper.Map<PaginatedList<ListUsersItemResponse>>(result);
+        return OkPaginated(response);
     }
 }
