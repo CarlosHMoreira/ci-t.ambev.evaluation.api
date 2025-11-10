@@ -23,7 +23,7 @@ public class UpdateUserHandler(
         var existingUser = await userRepository.GetByIdAsync(command.Id, cancellationToken);
         if (existingUser is null)
         {
-            throw new InvalidOperationException($"User with id {command.Id} not found");
+            throw new ValidationException($"User with id {command.Id} not found");
         }
         var user = mapper.Map(command, existingUser!);
 
