@@ -1,4 +1,4 @@
-using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.Domain.Services;
 using AutoMapper;
 using FluentValidation;
 using MediatR;
@@ -6,7 +6,7 @@ using MediatR;
 namespace Ambev.DeveloperEvaluation.Application.Users.UpdateUser;
 
 public class UpdateUserHandler(
-    IUserRepository userRepository,
+    UserService userService,
     IMapper mapper
 ) : IRequestHandler<UpdateUserCommand, UpdateUserResult>
 {
@@ -20,14 +20,14 @@ public class UpdateUserHandler(
             throw new ValidationException(validationResult.Errors);
         }
         
-        var existingUser = await userRepository.GetByIdAsync(command.Id, cancellationToken);
+        var existingUser = await userService.GetByIdAsync(command.Id, cancellationToken);
         if (existingUser is null)
         {
             throw new ValidationException($"User with id {command.Id} not found");
         }
         var user = mapper.Map(command, existingUser!);
 
-        var updatedUser = await userRepository.UpdateAsync(user, cancellationToken);
+        var updatedUser = await userService.UpdateAsync(user, cancellationToken);
         
         return mapper.Map<UpdateUserResult>(updatedUser);
     }

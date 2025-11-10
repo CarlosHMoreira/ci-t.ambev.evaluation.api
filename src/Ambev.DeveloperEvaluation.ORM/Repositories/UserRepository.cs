@@ -73,7 +73,7 @@ public class UserRepository : IUserRepository
         return true;
     }
 
-    public async Task<object> UpdateAsync(User user, CancellationToken cancellationToken)
+    public async Task<User> UpdateAsync(User user, CancellationToken cancellationToken)
     {
         _context.Users.Update(user);
         await _context.SaveChangesAsync(cancellationToken);

@@ -45,7 +45,7 @@ public interface IUserRepository
     /// <param name="user">The user to create</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The updated user</returns>
-    Task<object> UpdateAsync(User user, CancellationToken cancellationToken);
+    Task<User> UpdateAsync(User user, CancellationToken cancellationToken);
 
     /// <summary>
     /// Lists users with pagination and optional ordering.
