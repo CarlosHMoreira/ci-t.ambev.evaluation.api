@@ -1,4 +1,3 @@
-using Ambev.DeveloperEvaluation.Application.Products.ListProducts;
 using AutoMapper;
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.ValueObjects;
