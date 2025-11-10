@@ -1,6 +1,9 @@
-namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
+using Ambev.DeveloperEvaluation.Application.Products.Common;
+using MediatR;
 
-public class CreateProductResponse
+namespace Ambev.DeveloperEvaluation.Application.Products.UpdateProduct;
+
+public class UpdateProductCommand : IRequest<ProductResult>
 {
     public Guid Id { get; set; }
     public string Title { get; set; } = string.Empty;
@@ -8,11 +11,7 @@ public class CreateProductResponse
     public string Description { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string Image { get; set; } = string.Empty;
-    public RatingResponse Rating { get; set; } = new();
-}
-
-public class RatingResponse
-{
     public decimal Rate { get; set; }
     public int Count { get; set; }
 }
+

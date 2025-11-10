@@ -12,16 +12,5 @@ public class CreateProductCommand : IRequest<CreateProductResult>
     public string Image { get; set; } = string.Empty;
     public decimal Rate { get; set; }
     public int Count { get; set; }
-
-    public ValidationResultDetail Validate()
-    {
-        var validator = new CreateProductCommandValidator();
-        var result = validator.Validate(this);
-        return new ValidationResultDetail
-        {
-            IsValid = result.IsValid,
-            Errors = result.Errors.Select(e => (ValidationErrorDetail)e)
-        };
-    }
 }
 
