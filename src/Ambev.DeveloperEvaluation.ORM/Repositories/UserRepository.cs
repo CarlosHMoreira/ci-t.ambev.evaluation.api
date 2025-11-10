@@ -83,7 +83,7 @@ public class UserRepository : IUserRepository
     public async Task<(IEnumerable<User> Users, int TotalCount)> ListAsync(int page, int size, string? order, CancellationToken cancellationToken = default)
     {
         page = page < 1 ? 1 : page;
-        size = size < 100 ? 100 : size;
+        size = size is < 1 or > 100 ? 100 : size;
         
         var query = _context.Users.AsQueryable();
         
@@ -101,15 +101,9 @@ public class UserRepository : IUserRepository
             return query;
         }
         
-        foreach (var part in order.Split(','))
+        foreach (var part in order.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
         {
-            var trimmed = part.Trim();
-            if (string.IsNullOrEmpty(trimmed))
-            {
-                continue;
-            }
-                
-            var segments = trimmed.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var segments = part.Split(' ', StringSplitOptions.RemoveEmptyEntries);
             var field = segments[0].ToLowerInvariant();
             var direction = segments.Length > 1 ? segments[1].ToLowerInvariant() : "asc";
             query = ApplyOrdering(query, field, direction == "desc");
