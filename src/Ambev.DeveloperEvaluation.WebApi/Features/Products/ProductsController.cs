@@ -14,11 +14,13 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Products.CreateProduct;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListByCategory;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
 using Ambev.DeveloperEvaluation.WebApi.Features.Products.UpdateProduct;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Products;
 
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class ProductsController(IMediator mediator, IMapper mapper) : BaseController
 {
     [HttpPost]

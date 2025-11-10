@@ -22,5 +22,9 @@
         /// </summary>
         /// <returns>O papel do usuário como uma string.</returns>
         public string Role { get; }
+        /// <summary>
+        /// Obtém o status atual do usuário (ex: Active, Inactive, Suspended)
+        /// </summary>
+        public string Status { get; }
     }
 }

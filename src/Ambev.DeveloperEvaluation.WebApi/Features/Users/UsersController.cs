@@ -12,6 +12,7 @@ using Ambev.DeveloperEvaluation.Application.Users.UpdateUser;
 using Ambev.DeveloperEvaluation.WebApi.Features.Users.UpdateUser;
 using Ambev.DeveloperEvaluation.Application.Users.ListUsers;
 using Ambev.DeveloperEvaluation.WebApi.Features.Users.ListUsers;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Users;
 
@@ -20,6 +21,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Users;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : BaseController
 {
     private readonly IMediator _mediator;
@@ -43,6 +45,7 @@ public class UsersController : BaseController
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>The created user details</returns>
     [HttpPost]
+    [AllowAnonymous]
     [ProducesResponseType(typeof(ApiResponseWithData<CreateUserResponse>), StatusCodes.Status201Created)]
     [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CreateUser([FromBody] CreateUserRequest request, CancellationToken cancellationToken)
@@ -151,7 +154,7 @@ public class UsersController : BaseController
         return Ok(new ApiResponseWithData<UpdateUserResponse>
         {
             Success = true,
-            Message = "User created successfully",
+            Message = "User updated successfully",
             Data = _mapper.Map<UpdateUserResponse>(result)
         });
     }

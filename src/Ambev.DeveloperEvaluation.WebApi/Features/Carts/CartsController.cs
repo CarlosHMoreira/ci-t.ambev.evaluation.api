@@ -10,6 +10,7 @@ using Ambev.DeveloperEvaluation.WebApi.Features.Carts.ListCarts;
 using Ambev.DeveloperEvaluation.WebApi.Features.Carts.UpdateCart;
 using AutoMapper;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts;
@@ -19,6 +20,7 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Carts;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class CartsController(IMediator mediator, IMapper mapper) : BaseController
 {
     /// <summary>

@@ -82,6 +82,10 @@ public class User : BaseEntity, IUser
     /// </summary>
     /// <returns>The user's role as a string.</returns>
     string IUser.Role => Role.ToString();
+    /// <summary>
+    /// Implementação explícita para expor o Status como string via IUser
+    /// </summary>
+    string IUser.Status => Status.ToString();
 
     /// <summary>
     /// Initializes a new instance of the User class.
