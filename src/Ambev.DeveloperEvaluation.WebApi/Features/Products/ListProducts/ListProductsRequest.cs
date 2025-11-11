@@ -4,13 +4,18 @@ namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
 
 public class ListProductsRequest : Dictionary<string, string>
 {
-    [FromQuery(Name = "_page")] 
-    public int? Page { get; set; }
+    public int? Page => GetIntOrNull("_page");
     
-    [FromQuery(Name = "_size")] 
-    public int? Size { get; set; }
+    public int? Size => GetIntOrNull("_size");
     
-    [FromQuery(Name = "_order")] 
-    public string? Order { get; set; }
+    public string? Order => TryGetValue("_order", out var value) ? value : null;
+    private int? GetIntOrNull(string key)
+    {
+        if (TryGetValue(key, out var value) && int.TryParse(value, out var intValue))
+        {
+            return intValue;
+        }
+        return null;
+    }
 }
 
