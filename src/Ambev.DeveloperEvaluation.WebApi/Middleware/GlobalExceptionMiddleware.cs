@@ -1,5 +1,7 @@
 using FluentValidation;
 using System.Text.Json;
+using Ambev.DeveloperEvaluation.WebApi.Common;
+using Ambev.DeveloperEvaluation.Common.Validation;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Middleware;
 
@@ -32,20 +34,29 @@ public class GlobalExceptionMiddleware(RequestDelegate next, ILogger<GlobalExcep
         logger.LogError(ex, "Unhandled exception");
         return ex switch
         {
-            ValidationException ve => (StatusCodes.Status400BadRequest, BuildValidationError(ve)),
-            UnauthorizedAccessException ua => (StatusCodes.Status401Unauthorized, new ErrorResponse("AuthenticationError", "Unauthorized", ua.Message)),
-            KeyNotFoundException knf => (StatusCodes.Status404NotFound, new ErrorResponse("ResourceNotFound", "Not Found", knf.Message)),
-            InvalidOperationException ioe => (StatusCodes.Status400BadRequest, new ErrorResponse("InvalidOperation", "Invalid operation", ioe.Message)),
-            _ => (StatusCodes.Status500InternalServerError, new ErrorResponse("InternalServerError", "Unexpected error", "An unexpected error occurred"))
+            ValidationException ve => (StatusCodes.Status400BadRequest, BuildValidationApiResponse(ve)),
+            UnauthorizedAccessException ua => (StatusCodes.Status401Unauthorized, BuildApiResponse(false, "Unauthorized", ua.Message)),
+            KeyNotFoundException knf => (StatusCodes.Status404NotFound, BuildApiResponse(false, "Not Found", knf.Message)),
+            InvalidOperationException ioe => (StatusCodes.Status400BadRequest, BuildApiResponse(false, "Invalid operation", ioe.Message)),
+            _ => (StatusCodes.Status500InternalServerError, BuildApiResponse(false, "Unexpected error", "An unexpected error occurred"))
         };
     }
 
-    private static object BuildValidationError(ValidationException ve)
+    private static ApiResponse BuildValidationApiResponse(ValidationException ve)
     {
-        var details = ve.Errors.Select(e => $"{e.PropertyName}: {e.ErrorMessage}");
-        var joined = string.Join("; ", details);
-        return new ErrorResponse("ValidationError", "Invalid input data", joined);
+        var errors = ve.Errors.Select(e => new ValidationErrorDetail
+        {
+            Error = e.ErrorCode,
+            Detail = e.ErrorMessage
+        });
+        return new ApiResponse
+        {
+            Success = false,
+            Message = "Validation failed",
+            Errors = errors
+        };
     }
 
-    private sealed record ErrorResponse(string Type, string Error, string Detail);
+    private static ApiResponse BuildApiResponse(bool success, string message, string detail)
+        => new ApiResponse { Success = success, Message = $"{message}: {detail}" };
 }

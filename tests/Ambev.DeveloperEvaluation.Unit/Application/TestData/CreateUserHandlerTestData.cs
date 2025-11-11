@@ -1,8 +1,9 @@
 using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 using Bogus;
 
-namespace Ambev.DeveloperEvaluation.Unit.Domain;
+namespace Ambev.DeveloperEvaluation.Unit.Application.TestData;
 
 /// <summary>
 /// Provides methods for generating test data using the Bogus library.
@@ -21,13 +22,29 @@ public static class CreateUserHandlerTestData
     /// - Status (Active or Suspended)
     /// - Role (Customer or Admin)
     /// </summary>
-    private static readonly Faker<CreateUserCommand> createUserHandlerFaker = new Faker<CreateUserCommand>()
-        .RuleFor(u => u.Username, f => f.Internet.UserName())
+    private static readonly Faker<CreateUserCommand> CreateUserHandlerFaker = new Faker<CreateUserCommand>()
+        .RuleFor(u => u.Name, f => new FullName { FirstName = f.Name.FirstName(), LastName = f.Name.LastName() })
         .RuleFor(u => u.Password, f => $"Test@{f.Random.Number(100, 999)}")
         .RuleFor(u => u.Email, f => f.Internet.Email())
         .RuleFor(u => u.Phone, f => $"+55{f.Random.Number(11, 99)}{f.Random.Number(100000000, 999999999)}")
         .RuleFor(u => u.Status, f => f.PickRandom(UserStatus.Active, UserStatus.Suspended))
-        .RuleFor(u => u.Role, f => f.PickRandom(UserRole.Customer, UserRole.Admin));
+        .RuleFor(u => u.Role, f => f.PickRandom(UserRole.Customer, UserRole.Admin))
+        .RuleFor(u => u.Address,
+            f => new Address
+            {
+                City = f.Address.City(),
+                Street = f.Address.StreetName(),
+                Number = f.Random.Int(1,
+                    200),
+                ZipCode = f.Address.ZipCode("########"),
+                Geolocation = new Geolocation
+                {
+                    Latitude = f.Random.Decimal(-90,
+                        90),
+                    Longitude = f.Random.Decimal(-180,
+                        180)
+                }
+            });
 
     /// <summary>
     /// Generates a valid User entity with randomized data.
@@ -37,6 +54,6 @@ public static class CreateUserHandlerTestData
     /// <returns>A valid User entity with randomly generated data.</returns>
     public static CreateUserCommand GenerateValidCommand()
     {
-        return createUserHandlerFaker.Generate();
+        return CreateUserHandlerFaker.Generate();
     }
 }

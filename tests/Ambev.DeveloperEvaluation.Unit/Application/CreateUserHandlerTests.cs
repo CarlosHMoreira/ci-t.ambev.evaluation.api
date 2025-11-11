@@ -1,8 +1,11 @@
 using Ambev.DeveloperEvaluation.Application.Users.CreateUser;
 using Ambev.DeveloperEvaluation.Common.Security;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Services;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
-using Ambev.DeveloperEvaluation.Unit.Domain;
+using Ambev.DeveloperEvaluation.Domain.Events;
+using Ambev.DeveloperEvaluation.Unit.Application.TestData;
 using AutoMapper;
 using FluentAssertions;
 using NSubstitute;
@@ -16,6 +19,8 @@ namespace Ambev.DeveloperEvaluation.Unit.Application;
 public class CreateUserHandlerTests
 {
     private readonly IUserRepository _userRepository;
+    private readonly IDomainEventDispatcher _domainEventDispatcher;
+    private readonly UserService _userService;
     private readonly IMapper _mapper;
     private readonly IPasswordHasher _passwordHasher;
     private readonly CreateUserHandler _handler;
@@ -27,9 +32,11 @@ public class CreateUserHandlerTests
     public CreateUserHandlerTests()
     {
         _userRepository = Substitute.For<IUserRepository>();
+        _domainEventDispatcher = Substitute.For<IDomainEventDispatcher>();
         _mapper = Substitute.For<IMapper>();
         _passwordHasher = Substitute.For<IPasswordHasher>();
-        _handler = new CreateUserHandler(_userRepository, _mapper, _passwordHasher);
+        _userService = new UserService(_userRepository, _domainEventDispatcher);
+        _handler = new CreateUserHandler(_userService, _mapper, _passwordHasher);
     }
 
     /// <summary>
@@ -43,7 +50,8 @@ public class CreateUserHandlerTests
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Username = command.Username,
+            Name = command.Name,
+            Address = command.Address,
             Password = command.Password,
             Email = command.Email,
             Phone = command.Phone,
@@ -51,26 +59,43 @@ public class CreateUserHandlerTests
             Role = command.Role
         };
 
-        var result = new CreateUserResult
+        var created = new User
         {
             Id = user.Id,
+            Name = user.Name,
+            Address = user.Address,
+            Password = "hashedPassword",
+            Email = user.Email,
+            Phone = user.Phone,
+            Status = user.Status,
+            Role = user.Role
         };
 
+        var result = new CreateUserResult
+        {
+            Id = created.Id,
+            Name = created.Name,
+            Address = created.Address,
+            Email = created.Email,
+            Phone = created.Phone,
+            Role = created.Role,
+            Status = created.Status
+        };
 
         _mapper.Map<User>(command).Returns(user);
-        _mapper.Map<CreateUserResult>(user).Returns(result);
-
-        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
-            .Returns(user);
-        _passwordHasher.HashPassword(Arg.Any<string>()).Returns("hashedPassword");
+        _passwordHasher.HashPassword(command.Password).Returns("hashedPassword");
+        _userRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
+        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>()).Returns(created);
+        _mapper.Map<CreateUserResult>(created).Returns(result);
+        _domainEventDispatcher.DispatchAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // When
         var createUserResult = await _handler.Handle(command, CancellationToken.None);
 
         // Then
         createUserResult.Should().NotBeNull();
-        createUserResult.Id.Should().Be(user.Id);
-        await _userRepository.Received(1).CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>());
+        createUserResult.Id.Should().Be(created.Id);
+        await _userRepository.Received(1).CreateAsync(Arg.Is<User>(u => u.Password == "hashedPassword"), Arg.Any<CancellationToken>());
     }
 
     /// <summary>
@@ -80,7 +105,7 @@ public class CreateUserHandlerTests
     public async Task Handle_InvalidRequest_ThrowsValidationException()
     {
         // Given
-        var command = new CreateUserCommand(); // Empty command will fail validation
+        var command = new CreateUserCommand { Name = new FullName { FirstName = string.Empty, LastName = "Doe" }, Address = new Address { City = "", Street = "", Number = 0, ZipCode = "", Geolocation = new Geolocation { Latitude = 0, Longitude = 0 } } }; // Empty command will fail validation
 
         // When
         var act = () => _handler.Handle(command, CancellationToken.None);
@@ -102,18 +127,32 @@ public class CreateUserHandlerTests
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Username = command.Username,
+            Name = command.Name,
+            Address = command.Address,
             Password = command.Password,
             Email = command.Email,
             Phone = command.Phone,
             Status = command.Status,
             Role = command.Role
         };
+        var created = new User
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Address = user.Address,
+            Password = hashedPassword,
+            Email = user.Email,
+            Phone = user.Phone,
+            Status = user.Status,
+            Role = user.Role
+        };
 
         _mapper.Map<User>(command).Returns(user);
-        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
-            .Returns(user);
+        _userRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
         _passwordHasher.HashPassword(originalPassword).Returns(hashedPassword);
+        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>()).Returns(created);
+        _mapper.Map<CreateUserResult>(created).Returns(new CreateUserResult { Id = created.Id, Name = created.Name, Address = created.Address, Email = created.Email, Phone = created.Phone, Role = created.Role, Status = created.Status });
+        _domainEventDispatcher.DispatchAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // When
         await _handler.Handle(command, CancellationToken.None);
@@ -136,28 +175,42 @@ public class CreateUserHandlerTests
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Username = command.Username,
+            Name = command.Name,
+            Address = command.Address,
             Password = command.Password,
             Email = command.Email,
             Phone = command.Phone,
             Status = command.Status,
             Role = command.Role
         };
+        var created = new User
+        {
+            Id = user.Id,
+            Name = user.Name,
+            Address = user.Address,
+            Password = "hashedPassword",
+            Email = user.Email,
+            Phone = user.Phone,
+            Status = user.Status,
+            Role = user.Role
+        };
 
         _mapper.Map<User>(command).Returns(user);
-        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>())
-            .Returns(user);
+        _userRepository.GetByEmailAsync(command.Email, Arg.Any<CancellationToken>()).Returns((User?)null);
         _passwordHasher.HashPassword(Arg.Any<string>()).Returns("hashedPassword");
+        _userRepository.CreateAsync(Arg.Any<User>(), Arg.Any<CancellationToken>()).Returns(created);
+        _mapper.Map<CreateUserResult>(created).Returns(new CreateUserResult { Id = created.Id, Name = created.Name, Address = created.Address, Email = created.Email, Phone = created.Phone, Role = created.Role, Status = created.Status });
+        _domainEventDispatcher.DispatchAsync(Arg.Any<IDomainEvent>(), Arg.Any<CancellationToken>()).Returns(Task.CompletedTask);
 
         // When
         await _handler.Handle(command, CancellationToken.None);
 
         // Then
         _mapper.Received(1).Map<User>(Arg.Is<CreateUserCommand>(c =>
-            c.Username == command.Username &&
             c.Email == command.Email &&
             c.Phone == command.Phone &&
             c.Status == command.Status &&
-            c.Role == command.Role));
+            c.Role == command.Role &&
+            c.Name.FirstName == command.Name.FirstName));
     }
 }

@@ -71,7 +71,7 @@ public class UserTests
         // Arrange
         var user = new User
         {
-            Username = "", // Invalid: empty
+            // Username = "", // Invalid: empty
             Password = UserTestData.GenerateInvalidPassword(), // Invalid: doesn't meet password requirements
             Email = UserTestData.GenerateInvalidEmail(), // Invalid: not a valid email
             Phone = UserTestData.GenerateInvalidPhone(), // Invalid: doesn't match pattern

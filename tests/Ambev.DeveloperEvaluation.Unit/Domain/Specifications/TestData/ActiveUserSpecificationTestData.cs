@@ -1,5 +1,6 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Enums;
+using Ambev.DeveloperEvaluation.Domain.ValueObjects;
 using Bogus;
 
 namespace Ambev.DeveloperEvaluation.Unit.Domain.Specifications.TestData;
@@ -26,7 +27,11 @@ public static class ActiveUserSpecificationTestData
         .CustomInstantiator(f => new User {
             Email = f.Internet.Email(),
             Password = $"Test@{f.Random.Number(100, 999)}",
-            Username = f.Name.FirstName(),
+            Name = new FullName
+            {
+                FirstName = f.Name.FirstName(),
+                LastName = f.Name.LastName(),
+            },
             Status = f.PickRandom<UserStatus>(),
             Phone = $"+55{f.Random.Number(11, 99)}{f.Random.Number(100000000, 999999999)}",
             Role = f.PickRandom<UserRole> ()

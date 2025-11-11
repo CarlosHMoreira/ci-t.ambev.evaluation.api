@@ -88,7 +88,6 @@ public class UsersController : BaseController
 
         var command = _mapper.Map<GetUserCommand>(request.Id);
         var response = await _mediator.Send(command, cancellationToken);
-
         return Ok(new ApiResponseWithData<GetUserResponse>
         {
             Success = true,
@@ -118,7 +117,6 @@ public class UsersController : BaseController
 
         var command = _mapper.Map<DeleteUserCommand>(request.Id);
         await _mediator.Send(command, cancellationToken);
-
         return NoContent();
     }
     
@@ -150,7 +148,6 @@ public class UsersController : BaseController
 
         var command = _mapper.Map<UpdateUserCommand>(request);
         var result = await _mediator.Send(command, cancellationToken);
-
         return Ok(new ApiResponseWithData<UpdateUserResponse>
         {
             Success = true,
