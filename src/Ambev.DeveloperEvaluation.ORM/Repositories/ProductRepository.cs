@@ -1,5 +1,6 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
+using Ambev.DeveloperEvaluation.ORM.ListCriteriaFilter;
 using Microsoft.EntityFrameworkCore;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
@@ -34,9 +35,44 @@ public class ProductRepository(DefaultContext context) : IProductRepository
         return true;
     }
 
-    public async Task<(IEnumerable<Product> Products, int TotalCount)> ListAsync(int page, int size, string? order, CancellationToken cancellationToken = default)
+    public async Task<(IEnumerable<Product> Products, int TotalCount)> ListAsync(int page, int size, string? order, Dictionary<string, string> filters, CancellationToken cancellationToken = default)
     {
         var query = context.Products.AsQueryable();
+        
+        query = CriteriaFilters
+            .FromDictionary(filters)
+            .WhenMinNumeric<Product>(
+                forProperty: p => p.Price,
+                applyFilter: (queryable, minPrice) => queryable.Where(p => p.Price >= minPrice)
+            )
+            .WhenMaxNumeric<Product>(
+                forProperty: p => p.Price,
+                applyFilter: (queryable, maxPrice) => queryable.Where(p => p.Price <= maxPrice)
+            )
+            .WhenSearchingTerm<Product>(
+                forProperty: p => p.Title,
+                applyFilter: (queryable, term, match) => match switch
+                {
+                    SearchPatternMatch.Exact => queryable.Where(p => p.Title == term),
+                    SearchPatternMatch.StartsWith => queryable.Where(p => p.Title.StartsWith(term)),
+                    SearchPatternMatch.EndsWith => queryable.Where(p => p.Title.EndsWith(term)),
+                    SearchPatternMatch.Contains => queryable.Where(p => p.Title.Contains(term)),
+                    _ => queryable,
+                }
+            )
+            .WhenSearchingTerm<Product>(
+                forProperty: p => p.Category,
+                applyFilter: (queryable, term, match) => match switch
+                {
+                    SearchPatternMatch.Exact => queryable.Where(p => p.Category == term),
+                    SearchPatternMatch.StartsWith => queryable.Where(p => p.Category.StartsWith(term)),
+                    SearchPatternMatch.EndsWith => queryable.Where(p => p.Category.EndsWith(term)),
+                    SearchPatternMatch.Contains => queryable.Where(p => p.Category.Contains(term)),
+                    _ => queryable,
+                }
+            )
+            .Apply(query);
+        
         return await PaginatedQuery(query, page, size, order, cancellationToken);
     }
 

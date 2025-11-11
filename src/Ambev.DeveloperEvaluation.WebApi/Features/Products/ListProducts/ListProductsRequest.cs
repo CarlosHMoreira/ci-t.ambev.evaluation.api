@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Ambev.DeveloperEvaluation.WebApi.Features.Products.ListProducts;
 
-public class ListProductsRequest
+public class ListProductsRequest : Dictionary<string, string>
 {
     [FromQuery(Name = "_page")] 
     public int? Page { get; set; }

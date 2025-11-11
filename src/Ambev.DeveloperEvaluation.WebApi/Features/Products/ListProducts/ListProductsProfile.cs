@@ -13,7 +13,8 @@ public class ListProductsProfile : Profile
     {
         CreateMap<ListProductsRequest, ListProductsCommand>()
             .ForMember(d => d.Page, opt => opt.MapFrom(s => s.Page ?? DefaultPage))
-            .ForMember(d => d.Size, opt => opt.MapFrom(s => s.Size ?? DefaultSize));
+            .ForMember(d => d.Size, opt => opt.MapFrom(s => s.Size ?? DefaultSize))
+            .ForMember(d => d.Filters, opt => opt.MapFrom(s => s));
         
         CreateMap<ListProductsResult, PaginatedList<ProductResponse>>()
             .ConvertUsing((src, _, ctx) => new PaginatedList<ProductResponse>(
