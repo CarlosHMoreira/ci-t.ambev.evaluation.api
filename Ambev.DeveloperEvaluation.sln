@@ -54,7 +54,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambev.DeveloperEvaluation.Notification", "Ambev.DeveloperEvaluation.Notification\Ambev.DeveloperEvaluation.Notification.csproj", "{4910DD52-B4F2-483E-BB55-EFCC809260D8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ambev.DeveloperEvaluation.Notification", "src\Ambev.DeveloperEvaluation.Notification\Ambev.DeveloperEvaluation.Notification.csproj", "{4910DD52-B4F2-483E-BB55-EFCC809260D8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
