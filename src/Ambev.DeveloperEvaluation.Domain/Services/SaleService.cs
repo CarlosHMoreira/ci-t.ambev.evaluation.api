@@ -74,6 +74,12 @@ public class SaleService(
         {
             throw new InvalidOperationException($"User with id {sale.CustomerId} not found");
         }
+        
+        if (user.Status != Enums.UserStatus.Active)
+        {
+            throw new InvalidOperationException($"User with id {sale.CustomerId} is not active. Current status: {user.Status}");
+        }
+        
         sale.CustomerName = user.Name.ToString();
     }
 
@@ -88,6 +94,11 @@ public class SaleService(
             if (product == null)
             {
                 throw new InvalidOperationException($"Product with id {item.ProductId} not found");
+            }
+            
+            if (product.Price < 0)
+            {
+                throw new InvalidOperationException($"Product with id {item.ProductId} has invalid price: {product.Price}");
             }
             
             item.UnitPrice = product.Price;

@@ -1,6 +1,7 @@
 using Ambev.DeveloperEvaluation.Application.Sales.Common;
 using Ambev.DeveloperEvaluation.Application.Sales.CreateSale;
 using Ambev.DeveloperEvaluation.Domain.Entities;
+using Ambev.DeveloperEvaluation.Domain.Enums;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Ambev.DeveloperEvaluation.Domain.Services;
 using Ambev.DeveloperEvaluation.Domain.Events;
@@ -590,5 +591,107 @@ public class CreateSaleHandlerTests
         result.Should().NotBeNull();
         result.Items.First().DiscountPercent.Should().Be(20m);
         result.Items.First().TotalNetAmount.Should().Be(1600.00m);
+    }
+
+    [Fact(DisplayName = "Given sale with inactive customer When creating sale Then throws exception")]
+    public async Task Handle_InactiveCustomer_ThrowsException()
+    {
+        var command = CreateSaleHandlerTestData.GenerateValidCommand();
+        
+        var products = command.Items.Select(i => new Product
+        {
+            Id = i.ProductId,
+            Title = "Test Product",
+            Price = 100.00m,
+            Description = "Test Description",
+            Category = "Test Category",
+            Image = "test.jpg"
+        }).ToArray();
+
+        var inactiveCustomer = new User
+        {
+            Id = command.CustomerId,
+            Name = new FullName { FirstName = "John", LastName = "Doe" },
+            Email = "john.doe@test.com",
+            Status = UserStatus.Inactive
+        };
+
+        _productRepository.GetProductsByIdsAsync(Arg.Any<Guid[]>(), Arg.Any<CancellationToken>())
+            .Returns(products);
+        _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
+            .Returns(inactiveCustomer);
+
+        var act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*is not active*");
+    }
+
+    [Fact(DisplayName = "Given sale with suspended customer When creating sale Then throws exception")]
+    public async Task Handle_SuspendedCustomer_ThrowsException()
+    {
+        var command = CreateSaleHandlerTestData.GenerateValidCommand();
+        
+        var products = command.Items.Select(i => new Product
+        {
+            Id = i.ProductId,
+            Title = "Test Product",
+            Price = 100.00m,
+            Description = "Test Description",
+            Category = "Test Category",
+            Image = "test.jpg"
+        }).ToArray();
+
+        var suspendedCustomer = new User
+        {
+            Id = command.CustomerId,
+            Name = new FullName { FirstName = "John", LastName = "Doe" },
+            Email = "john.doe@test.com",
+            Status = UserStatus.Suspended
+        };
+
+        _productRepository.GetProductsByIdsAsync(Arg.Any<Guid[]>(), Arg.Any<CancellationToken>())
+            .Returns(products);
+        _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
+            .Returns(suspendedCustomer);
+
+        var act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*is not active*");
+    }
+
+    [Fact(DisplayName = "Given product with negative price When creating sale Then throws exception")]
+    public async Task Handle_ProductWithNegativePrice_ThrowsException()
+    {
+        var command = CreateSaleHandlerTestData.GenerateValidCommand();
+        
+        var products = command.Items.Select(i => new Product
+        {
+            Id = i.ProductId,
+            Title = "Test Product",
+            Price = -10.00m,
+            Description = "Test Description",
+            Category = "Test Category",
+            Image = "test.jpg"
+        }).ToArray();
+
+        var customer = new User
+        {
+            Id = command.CustomerId,
+            Name = new FullName { FirstName = "John", LastName = "Doe" },
+            Email = "john.doe@test.com",
+            Status = UserStatus.Active
+        };
+
+        _productRepository.GetProductsByIdsAsync(Arg.Any<Guid[]>(), Arg.Any<CancellationToken>())
+            .Returns(products);
+        _userRepository.GetByIdAsync(command.CustomerId, Arg.Any<CancellationToken>())
+            .Returns(customer);
+
+        var act = () => _handler.Handle(command, CancellationToken.None);
+
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*has invalid price*");
     }
 }
