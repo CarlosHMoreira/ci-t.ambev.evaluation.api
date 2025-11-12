@@ -6,20 +6,23 @@ namespace Ambev.DeveloperEvaluation.ORM.Mapping;
 
 public class SaleConfiguration : IEntityTypeConfiguration<Sale>
 {
+    private const string DecimalType = "numeric(18,2)";
+    private const string DiscountPercentType = "numeric(5,2)";
+
     public void Configure(EntityTypeBuilder<Sale> builder)
     {
         builder.ToTable("Sales");
         builder.HasKey(s => s.Id);
         builder.Property(s => s.Id).HasDefaultValueSql("gen_random_uuid()");
 
-        builder.Property(s => s.Number).HasMaxLength(50).IsRequired();
+        builder.Property(s => s.Number).ValueGeneratedOnAdd();
         builder.Property(s => s.Date).IsRequired();
         builder.Property(s => s.CustomerId).IsRequired();
         builder.Property(s => s.CustomerName).HasMaxLength(200).IsRequired();
         builder.Property(s => s.BranchId).IsRequired();
         builder.Property(s => s.BranchName).HasMaxLength(200).IsRequired();
         builder.Property(s => s.IsCancelled).IsRequired().HasDefaultValue(false);
-        builder.Property(s => s.TotalAmount).HasColumnType("numeric(18,2)").IsRequired();
+        builder.Property(s => s.TotalAmount).HasColumnType(DecimalType).IsRequired();
         
         
         builder.HasOne(s => s.Customer)
@@ -36,11 +39,11 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
             itemBuilder.Property(i => i.ProductId).IsRequired();
             itemBuilder.Property(i => i.ProductTitle).HasMaxLength(200).IsRequired();
             itemBuilder.Property(i => i.Quantity).IsRequired();
-            itemBuilder.Property(i => i.UnitPrice).HasColumnType("numeric(18,2)").IsRequired();
-            itemBuilder.Property(i => i.DiscountPercent).HasColumnType("numeric(5,2)").IsRequired();
-            itemBuilder.Property(i => i.DiscountValue).HasColumnType("numeric(18,2)").IsRequired();
-            itemBuilder.Property(i => i.TotalGrossAmount).HasColumnType("numeric(18,2)").IsRequired();
-            itemBuilder.Property(i => i.TotalNetAmount).HasColumnType("numeric(18,2)").IsRequired();
+            itemBuilder.Property(i => i.UnitPrice).HasColumnType(DecimalType).IsRequired();
+            itemBuilder.Property(i => i.DiscountPercent).HasColumnType(DiscountPercentType).IsRequired();
+            itemBuilder.Property(i => i.DiscountValue).HasColumnType(DecimalType).IsRequired();
+            itemBuilder.Property(i => i.TotalGrossAmount).HasColumnType(DecimalType).IsRequired();
+            itemBuilder.Property(i => i.TotalNetAmount).HasColumnType(DecimalType).IsRequired();
             itemBuilder.Property(i => i.IsCancelled).IsRequired().HasDefaultValue(false);
             
             itemBuilder
@@ -57,4 +60,3 @@ public class SaleConfiguration : IEntityTypeConfiguration<Sale>
         builder.HasIndex(s => s.IsCancelled);
     }
 }
-

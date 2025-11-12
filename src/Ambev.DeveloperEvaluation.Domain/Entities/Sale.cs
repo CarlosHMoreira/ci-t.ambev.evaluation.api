@@ -6,7 +6,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Entities;
 
 public class Sale : BaseEntity
 {
-    public string Number { get; set; } = string.Empty;
+    public int Number { get; set; }
     public DateTime Date { get; set; } = DateTime.UtcNow;
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;

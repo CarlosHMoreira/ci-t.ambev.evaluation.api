@@ -3,7 +3,7 @@ namespace Ambev.DeveloperEvaluation.Domain.Events.Sale;
 public sealed class SaleCancelledEvent(Entities.Sale sale) : DomainEvent
 {
     public Guid SaleId { get; } = sale.Id;
-    public string Number { get; } = sale.Number;
+    public int Number { get; } = sale.Number;
     public decimal Total { get; } = sale.TotalAmount;
 }
 

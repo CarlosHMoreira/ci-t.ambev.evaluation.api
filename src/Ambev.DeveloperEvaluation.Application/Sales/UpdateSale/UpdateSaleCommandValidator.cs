@@ -7,7 +7,6 @@ public class UpdateSaleCommandValidator : AbstractValidator<UpdateSaleCommand>
     public UpdateSaleCommandValidator()
     {
         RuleFor(x => x.Id).NotEmpty();
-        RuleFor(x => x.Number).NotEmpty();
         RuleFor(x => x.CustomerId).NotEmpty();
         RuleFor(x => x.BranchId).NotEmpty();
         RuleForEach(x => x.Items).ChildRules(item =>

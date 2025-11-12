@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
@@ -16,7 +17,8 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false, defaultValueSql: "gen_random_uuid()"),
-                    Number = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: false),
+                    Number = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
                     CustomerName = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),

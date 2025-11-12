@@ -1,7 +1,7 @@
 using Ambev.DeveloperEvaluation.Domain.Entities;
 using Ambev.DeveloperEvaluation.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
-using Ambev.DeveloperEvaluation.ORM.ListCriteriaFilter; // add criteria filters
+using Ambev.DeveloperEvaluation.ORM.ListCriteriaFilter;
 
 namespace Ambev.DeveloperEvaluation.ORM.Repositories;
 
@@ -45,14 +45,10 @@ public class SaleRepository(DefaultContext context) : ISaleRepository
 
         query = CriteriaFilters
             .FromDictionary(filters)
-            .WhenSearchingTerm<Sale>(s => s.Number, (q, term, match) => match switch
-            {
-                SearchPatternMatch.Exact => q.Where(s => s.Number == term),
-                SearchPatternMatch.StartsWith => q.Where(s => s.Number.StartsWith(term)),
-                SearchPatternMatch.EndsWith => q.Where(s => s.Number.EndsWith(term)),
-                SearchPatternMatch.Contains => q.Where(s => s.Number.Contains(term)),
-                _ => q
-            })
+            .WhenMaxNumeric<Sale>(
+                forProperty: s => s.Number,
+                applyFilter: (q, max) => q.Where(s => s.Number <= max)
+            )
             .WhenSearchingTerm<Sale>(s => s.BranchName, (q, term, match) => match switch
             {
                 SearchPatternMatch.Exact => q.Where(s => s.BranchName == term),

@@ -15,7 +15,6 @@ public class UpdateSaleItemDto
 public class UpdateSaleCommand : IRequest<SaleResult>
 {
     public Guid Id { get; set; }
-    public string Number { get; set; } = string.Empty;
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;
     public Guid BranchId { get; set; }

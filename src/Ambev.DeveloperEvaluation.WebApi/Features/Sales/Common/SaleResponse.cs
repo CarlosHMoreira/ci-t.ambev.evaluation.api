@@ -16,7 +16,7 @@ public class SaleItemResponse
 public class SaleResponse
 {
     public Guid Id { get; set; }
-    public string Number { get; set; } = string.Empty;
+    public int Number { get; set; }
     public DateTime Date { get; set; }
     public Guid CustomerId { get; set; }
     public string CustomerName { get; set; } = string.Empty;

@@ -108,10 +108,11 @@ namespace Ambev.DeveloperEvaluation.ORM.Migrations
                         .HasColumnType("boolean")
                         .HasDefaultValue(false);
 
-                    b.Property<string>("Number")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
+                    b.Property<int>("Number")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Number"));
 
                     b.Property<decimal>("TotalAmount")
                         .HasColumnType("numeric(18,2)");
