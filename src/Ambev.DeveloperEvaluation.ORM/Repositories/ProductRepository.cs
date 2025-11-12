@@ -19,6 +19,11 @@ public class ProductRepository(DefaultContext context) : IProductRepository
         return await context.Products.FirstOrDefaultAsync(p => p.Id == id, cancellationToken);
     }
 
+    public async Task<IEnumerable<Product>> GetProductsByIdsAsync(IEnumerable<Guid> ids, CancellationToken cancellationToken = default)
+    {
+        return await context.Products.Where(p => ids.Contains(p.Id)).ToListAsync(cancellationToken);
+    }
+
     public async Task<Product> UpdateAsync(Product product, CancellationToken cancellationToken = default)
     {
         context.Products.Update(product);

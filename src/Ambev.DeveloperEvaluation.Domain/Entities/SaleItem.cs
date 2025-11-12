@@ -14,15 +14,9 @@ public class SaleItem
     
     public Product? Product { get; set; }
 
-    public void ApplyRules()
+    public void CalculateSaleValue()
     {
         TotalGrossAmount = Quantity * UnitPrice;
-        DiscountPercent = Quantity switch
-        {
-            >= 10 and <= 20 => 20m,
-            >= 4 and < 10 => 10m,
-            _ => 0m
-        };
         DiscountValue = (TotalGrossAmount * DiscountPercent) / 100m;
         TotalNetAmount = TotalGrossAmount - DiscountValue;
     }
