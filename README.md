@@ -1,7 +1,7 @@
 # Developer Evaluation Project
 
 ## Review após implementação
-Foi ajustado o projeto para funcionar no ambiente do MacOS, mais detalhes em [](./docs/linux-or-mac-local-setup.md).
+Foi ajustado o projeto para funcionar no ambiente do MacOS, mais detalhes em [/docs/linux-or-mac-local-setup.md](./docs/linux-or-mac-local-setup.md).
 Nota-se que o domínio de Carts foi implementado e posteriormente de Sales, talvez tenha entendido errado a motivação de ambos, mas 
 o desejado era que pudesse criar um Sale a partir de um Cart, ou seja, o Cart seria o "carrinho de compras" e o Sale a finalização da compra.
 
