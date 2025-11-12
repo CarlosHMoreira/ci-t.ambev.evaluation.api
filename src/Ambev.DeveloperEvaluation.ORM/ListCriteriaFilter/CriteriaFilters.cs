@@ -66,7 +66,7 @@ public sealed class CriteriaFilters : Dictionary<string, string>
         ArgumentNullException.ThrowIfNull(forProperty);
         ArgumentNullException.ThrowIfNull(applyFilter);
         var memberName = ExtractMemberName(forProperty.Body);
-        var key = memberName.ToLower();
+        var key = ToCamelCase(memberName);
         
         var prepareValue = new Func<IQueryable<TEntity>, string?, IQueryable<TEntity>>((query, value) =>
         {
@@ -131,5 +131,15 @@ public sealed class CriteriaFilters : Dictionary<string, string>
         }
         
         return prefix + propertyName;
+    }
+
+    private static string ToCamelCase(string pascalCase)
+    {
+        if (string.IsNullOrWhiteSpace(pascalCase))
+        {
+            return pascalCase;
+        }
+
+        return char.ToLowerInvariant(pascalCase[0]) + pascalCase[1..];
     }
 }
